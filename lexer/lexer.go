@@ -32,6 +32,8 @@ func (l *Lexer) NextToken() token.Token {
 		}
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
+	case ':':
+		tok = newToken(token.COLON, l.ch)
 	case '(':
 		tok = newToken(token.LPAREN, l.ch)
 	case ')':
@@ -40,6 +42,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case '[':
+		tok = newToken(token.LBRACKET, l.ch)
+	case ']':
+		tok = newToken(token.RBRACKET, l.ch)
 	case ',':
 		tok = newToken(token.COMMA, l.ch)
 	case '+':
@@ -66,6 +72,9 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
@@ -119,6 +128,44 @@ func (l *Lexer) readNumber() string {
 		l.readChar()
 	}
 	return l.input[position:l.position]
+}
+
+func (l *Lexer) readString() string {
+	//position := l.position + 1 // skip "
+	var str []byte
+
+	for {
+		l.readChar()
+		ch := l.ch
+
+		// Forward slash marks the beginning of an escape sequence
+		if ch == '\\' {
+			parsedSequence := []byte(l.parseEscapeSequence())
+			str = append(str, parsedSequence...)
+			continue
+		} else if ch == '"' || ch == 0 {
+			break
+		}
+
+		str = append(str, ch)
+	}
+
+	return string(str) /// l.input[position:l.position]
+}
+
+func (l *Lexer) parseEscapeSequence() string {
+	l.readChar()
+	switch l.ch {
+	case '"':
+		return "\""
+	case 'n':
+		return "\n"
+	case 't':
+		return "\t"
+	}
+
+	// TODO: how to bubble up an error ?
+	return ""
 }
 
 func (l *Lexer) skipWhitespace() {
