@@ -130,8 +130,8 @@ var builtins = map[string]*object.Builtin{
 			setB := args[1].(*object.Set)
 
 			var newSet []object.Object
-			copy(newSet, setA.Elements())
-			copy(newSet, setB.Elements())
+			newSet = append(newSet, setA.Elements()...)
+			newSet = append(newSet, setB.Elements()...)
 			return object.NewSet(newSet)
 		},
 	},

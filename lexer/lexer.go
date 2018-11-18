@@ -150,7 +150,7 @@ func (l *Lexer) readString() string {
 		str = append(str, ch)
 	}
 
-	return string(str) /// l.input[position:l.position]
+	return string(str)
 }
 
 func (l *Lexer) parseEscapeSequence() string {

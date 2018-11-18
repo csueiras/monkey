@@ -233,7 +233,7 @@ func (s *Set) Inspect() string {
 }
 
 func (s *Set) Elements() []Object {
-	if s.Data == nil {
+	if s.Data == nil || len(s.Data) == 0 {
 		return []Object{}
 	}
 
@@ -242,6 +242,5 @@ func (s *Set) Elements() []Object {
 	for _, v := range s.Data {
 		elements = append(elements, v.Key)
 	}
-
 	return elements
 }
